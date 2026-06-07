@@ -379,11 +379,6 @@ def napis_detail(t, trasy):
           <div id="qr-mapy" class="qr"></div>
           <figcaption><strong>Mapy.cz</strong><span>otevři trasu</span></figcaption>
         </figure>"""
-    qr_karty += """
-        <figure class="qr-karta">
-          <div id="qr-gpx" class="qr"></div>
-          <figcaption><strong>GPX</strong><span>stáhni do mobilu</span></figcaption>
-        </figure>"""
 
     # Odkazy na ostatní trasy.
     ostatni = []
@@ -657,7 +652,6 @@ JS = """
       } catch (e) { /* QR nepovinné */ }
     }
   }
-  vykresliQR('qr-gpx', new URL(d.gpx, window.location.href).href);
   if (d.mapy) vykresliQR('qr-mapy', d.mapy);
 
   // --- Výškový profil (Chart.js) ---
