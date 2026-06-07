@@ -358,25 +358,16 @@ def napis_detail(t, trasy):
         "coords": coords,
         "profil": t.profil,
         "korab": [KORAB_LAT, KORAB_LON],
-        "gpx": f"assets/gpx/{t.slug}.gpx",
     }
-    data["mapy"] = t.mapy_url
     data_json = json.dumps(data, ensure_ascii=False)
 
-    # QR karty: Mapy.cz + přímý GPX.
-    # Mapy.cz QR: buď hotový obrázek (qr/<slug>.png), nebo vygenerovaný z odkazu.
+    # QR karta Mapy.cz (hotový obrázek qr/<slug>.png).
     qr_img = os.path.join(ZAKLAD, "qr", t.slug + ".png")
     qr_karty = ""
     if os.path.isfile(qr_img):
         qr_karty += f"""
         <figure class="qr-karta">
           <div class="qr"><img src="assets/qr/{t.slug}.png" alt="QR Mapy.cz"></div>
-          <figcaption><strong>Mapy.cz</strong><span>otevři trasu</span></figcaption>
-        </figure>"""
-    elif t.mapy_url:
-        qr_karty += """
-        <figure class="qr-karta">
-          <div id="qr-mapy" class="qr"></div>
           <figcaption><strong>Mapy.cz</strong><span>otevři trasu</span></figcaption>
         </figure>"""
 
@@ -471,7 +462,6 @@ def napis_detail(t, trasy):
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
   <script>window.TRASA = {data_json};</script>
   <script src="assets/trasa.js"></script>
 </body>
@@ -638,22 +628,6 @@ JS = """
   // Po načtení dorovnat velikost.
   setTimeout(()=>map.invalidateSize(), 200);
 
-  // --- QR kódy do mobilu ---
-  // GPX: absolutní URL sestavíme z aktuální adresy stránky, takže funguje
-  // lokálně i po nasazení (PythonAnywhere). Mapy.cz: rovnou daný odkaz.
-  function vykresliQR(id, url){
-    const el = document.getElementById(id);
-    if (el && url && typeof qrcode !== 'undefined') {
-      try {
-        const qr = qrcode(0, 'M');
-        qr.addData(url);
-        qr.make();
-        el.innerHTML = qr.createSvgTag({cellSize:4, margin:1, scalable:true});
-      } catch (e) { /* QR nepovinné */ }
-    }
-  }
-  if (d.mapy) vykresliQR('qr-mapy', d.mapy);
-
   // --- Výškový profil (Chart.js) ---
   const ctx = document.getElementById('profil');
   new Chart(ctx, {
@@ -700,14 +674,6 @@ def main():
             if jmeno.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
                 shutil.copy2(os.path.join(zdroj_foto, jmeno),
                              os.path.join(cil_foto, jmeno))
-
-    # Zkopírujeme GPX soubory pod čisté názvy (slug.gpx) ke stažení.
-    cil_gpx = os.path.join(VYSTUP, "assets", "gpx")
-    os.makedirs(cil_gpx, exist_ok=True)
-    for d in TRASY_DEF:
-        zdroj = os.path.join(ZAKLAD, d["soubor"])
-        if os.path.isfile(zdroj):
-            shutil.copy2(zdroj, os.path.join(cil_gpx, d["slug"] + ".gpx"))
 
     # Zkopírujeme hotové QR obrázky (Mapy.cz), pokud existují.
     zdroj_qr = os.path.join(ZAKLAD, "qr")

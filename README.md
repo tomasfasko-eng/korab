@@ -30,16 +30,16 @@ site/
     style.css
     trasa.js
     foto/                 # fotky do bannerů
-    gpx/                  # GPX ke stažení (maly.gpx, stredni.gpx, …)
+    qr/                   # QR kódy Mapy.cz (maly.png, stredni.png, …)
 ```
 
-Web je **samostatný** — mapa (Leaflet + OpenStreetMap), graf (Chart.js) a QR
-kód (qrcode-generator) se načítají z CDN, data tras jsou vložená přímo ve
-stránkách. Žádný server běžet nemusí.
+Web je **samostatný** — mapa (Leaflet + OpenStreetMap) a graf (Chart.js) se
+načítají z CDN, data tras jsou vložená přímo ve stránkách. Žádný server běžet
+nemusí.
 
-Každá trasa má **QR kód a tlačítko ke stažení GPX**. QR se generuje v
-prohlížeči z aktuální adresy stránky, takže funguje lokálně i po nasazení
-(automaticky odkazuje na správnou doménu) bez jakýchkoli úprav.
+Každá trasa má **QR kód Mapy.cz** — po naskenování se otevře trasa přímo
+v Mapy.cz (prohlížení, navigace, stažení GPX). QR obrázky jsou ve složce `qr/`
+(soubory `<slug>.png`) a kopírují se do `site/assets/qr/`.
 
 ## Generování
 
@@ -124,8 +124,8 @@ cd ~/korab && git pull && python3 build.py
 ```
 a v záložce **Web** dej **Reload**.
 
-> QR kódy se generují z adresy stránky, takže po nasazení automaticky míří na
-> `…pythonanywhere.com` a fungují odkudkoliv — žádná úprava není potřeba.
+> QR kódy Mapy.cz míří na mapy.cz, takže fungují každému návštěvníkovi bez
+> ohledu na to, zda je web chráněný heslem.
 
 ## Zdroje dat
 
