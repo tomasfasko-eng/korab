@@ -363,9 +363,17 @@ def napis_detail(t, trasy):
     data["mapy"] = t.mapy_url
     data_json = json.dumps(data, ensure_ascii=False)
 
-    # QR karty: Mapy.cz (pokud máme odkaz) + přímý GPX.
+    # QR karty: Mapy.cz + přímý GPX.
+    # Mapy.cz QR: buď hotový obrázek (qr/<slug>.png), nebo vygenerovaný z odkazu.
+    qr_img = os.path.join(ZAKLAD, "qr", t.slug + ".png")
     qr_karty = ""
-    if t.mapy_url:
+    if os.path.isfile(qr_img):
+        qr_karty += f"""
+        <figure class="qr-karta">
+          <div class="qr"><img src="assets/qr/{t.slug}.png" alt="QR Mapy.cz"></div>
+          <figcaption><strong>Mapy.cz</strong><span>otevři trasu</span></figcaption>
+        </figure>"""
+    elif t.mapy_url:
         qr_karty += """
         <figure class="qr-karta">
           <div id="qr-mapy" class="qr"></div>
@@ -577,7 +585,7 @@ h1,h2,h3{line-height:1.2;font-weight:700;letter-spacing:-0.01em;}
 .qr-karta{margin:0;background:#fff;border-radius:14px;padding:.7rem .7rem .5rem;
   display:flex;flex-direction:column;align-items:center;width:150px;}
 .qr{width:130px;height:130px;display:flex;align-items:center;justify-content:center;}
-.qr svg{width:130px;height:130px;display:block;}
+.qr svg,.qr img{width:130px;height:130px;display:block;}
 .qr-karta figcaption{margin-top:.4rem;text-align:center;color:var(--text);line-height:1.25;}
 .qr-karta figcaption strong{display:block;font-size:1rem;}
 .qr-karta figcaption span{font-size:.78rem;color:var(--seda);}
@@ -706,6 +714,16 @@ def main():
         zdroj = os.path.join(ZAKLAD, d["soubor"])
         if os.path.isfile(zdroj):
             shutil.copy2(zdroj, os.path.join(cil_gpx, d["slug"] + ".gpx"))
+
+    # Zkopírujeme hotové QR obrázky (Mapy.cz), pokud existují.
+    zdroj_qr = os.path.join(ZAKLAD, "qr")
+    if os.path.isdir(zdroj_qr):
+        cil_qr = os.path.join(VYSTUP, "assets", "qr")
+        os.makedirs(cil_qr, exist_ok=True)
+        for jmeno in os.listdir(zdroj_qr):
+            if jmeno.lower().endswith(".png"):
+                shutil.copy2(os.path.join(zdroj_qr, jmeno),
+                             os.path.join(cil_qr, jmeno))
 
     trasy = [nacti_trasu(d) for d in TRASY_DEF]
 
