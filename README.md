@@ -86,37 +86,43 @@ python3 -m http.server 8099
 # → otevři http://localhost:8099
 ```
 
-## Nasazení na PythonAnywhere
+## Nasazení na PythonAnywhere (přes Git)
 
-Web obsluhuje malá Flask appka (`flask_app.py`), která servíruje složku
-`site/`. Nasazení přes ZIP + Bash konzoli (nejrychlejší):
+Repozitář: <https://github.com/tomasfasko-eng/korab> (veřejný).
+Web obsluhuje malá Flask appka (`flask_app.py`), která servíruje složku `site/`.
 
-1. **Vytvoř balíček** lokálně:
-   ```bash
-   python3 build.py
-   zip -rq korab-deploy.zip site flask_app.py -x "*.DS_Store"
-   ```
-2. **Nahraj ZIP** na PythonAnywhere (záložka *Files*) do domovské složky.
-3. **Bash konzole** (*Consoles → Bash*):
-   ```bash
-   unzip -o korab-deploy.zip -d ~/korab
-   pip install --user flask        # pokud Flask chybí
-   ```
-4. **Web app** (*Web → Add a new web app → Manual configuration → Python 3.x*).
-5. **WSGI soubor** (odkaz v *Web*) — smaž obsah a vlož:
-   ```python
-   import sys
-   cesta = "/home/UZIVATEL/korab"          # uprav UZIVATEL
-   if cesta not in sys.path:
-       sys.path.insert(0, cesta)
-   from flask_app import app as application
-   ```
-6. **Reload** web app. Hotovo → `https://UZIVATEL.pythonanywhere.com`.
+**První nasazení** — v *Consoles → Bash*:
+```bash
+git clone https://github.com/tomasfasko-eng/korab.git ~/korab
+cd ~/korab
+pip install --user Flask
+python3 build.py
+```
+
+Pak **Web → Add a new web app → Manual configuration → Python 3.10**, otevři
+**WSGI configuration file**, smaž obsah a vlož:
+```python
+import sys
+
+cesta = "/home/tomasfasko/korab"
+if cesta not in sys.path:
+    sys.path.insert(0, cesta)
+
+from flask_app import app as application
+```
+**Save** → **Reload**. Hotovo → <https://tomasfasko.pythonanywhere.com>
 
 ### Aktualizace webu
 
-Po změně tras/fotek znovu `python3 build.py`, vytvoř nový ZIP, nahraj,
-v Bash konzoli `unzip -o korab-deploy.zip -d ~/korab` a **Reload** web app.
+Lokálně uprav (trasy, fotky, texty), ověř `python3 build.py`, a:
+```bash
+git add -A && git commit -m "popis změny" && git push
+```
+Pak na PythonAnywhere v Bash konzoli:
+```bash
+cd ~/korab && git pull && python3 build.py
+```
+a v záložce **Web** dej **Reload**.
 
 > QR kódy se generují z adresy stránky, takže po nasazení automaticky míří na
 > `…pythonanywhere.com` a fungují odkudkoliv — žádná úprava není potřeba.
