@@ -1,0 +1,14 @@
+# Vygenerovaný web (vznikne z build.py)
+site/
+
+# Balíček pro ruční nahrání (nepoužíváme s gitem)
+korab-deploy.zip
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Lokální nástroje / systém
+.claude/
+.DS_Store
